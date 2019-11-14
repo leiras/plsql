@@ -13,8 +13,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import br.gov.sc.ciasc.plsql.ConectorOracle;
-
 class TesteSomaUm {
 	
 	@BeforeAll
@@ -35,41 +33,30 @@ class TesteSomaUm {
 
 	@Test
 	void testeSomaNumeroInteiro() {
-		ConectorOracle co = new ConectorOracle();
-		Connection conn = co.obterConexao();
-		CallableStatement cStmt;
-		try {
-			cStmt = conn.prepareCall("{? = call somaum(?)}");
-			cStmt.registerOutParameter( 1, Types.FLOAT);
-			cStmt.setFloat(2, 6);
-			
-			cStmt.execute();						
-			Float resultado = cStmt.getFloat(1);
-			assertEquals(7, resultado);			
-		
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}	
-		co.liberarConexao(conn);
+		assertEquals(new Double(7), somaum(new Double(6)));
 	}
 
 	@Test
 	void testeSomaNumeroFracionario() {
+		assertEquals(new Double(12.11), somaum(new Double(11.11)));
+	}
+	
+	private Double somaum(Double numero) {
+		Double resultado = null;
 		ConectorOracle co = new ConectorOracle();
 		Connection conn = co.obterConexao();
 		CallableStatement cStmt;
 		try {
 			cStmt = conn.prepareCall("{? = call somaum(?)}");
-			cStmt.registerOutParameter( 1, Types.FLOAT);
-			cStmt.setFloat( 2, new Float(11.11));			
-			cStmt.execute();						
-			Float resultado = cStmt.getFloat(1);						
-			assertEquals(new Float(12.11), resultado);			
-		
+			cStmt.registerOutParameter( 1, Types.DOUBLE);
+			cStmt.setDouble(2, numero);		
+			cStmt.execute();	
+			resultado = cStmt.getDouble(1);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}	
-		co.liberarConexao(conn);
+		co.liberarConexao(conn);	
+		return resultado;
 	}
 	
 }
